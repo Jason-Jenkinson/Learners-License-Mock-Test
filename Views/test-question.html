@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./css/test-question.css" rel="stylesheet" />
+    <title>Test_MultipleChoice</title>
+  </head>
+  <body>
+    <div class="v5_2">
+      <span class="v5_3">Question 5 of 64</span>
+      <span class="v5_15">Time Remaining: 19:55</span>
+      <span class="v5_4"
+        >Question Text block
+      </span>
+      <button
+        class="quiz-button answer-button v5_6"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v5_12">A) Answer text</span>
+      </button>
+      <button
+        class="quiz-button answer-button v5_8"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v5_13">B) Answer text</span>
+      </button>
+      <button
+        class="quiz-button answer-button v5_10"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v5_14">C) Answer text</span>
+      </button>
+
+      <button
+        class="quiz-button navigation-button navigation-button--next v5_16"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v5_17">Next</span>
+      </button>
+      <button
+        class="quiz-button navigation-button navigation-button--previous v5_19"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v5_20">Previous</span>
+      </button>
+    </div>
+    <script>
+      const answerButtons = document.querySelectorAll(".answer-button");
+
+      answerButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          answerButtons.forEach((answerButton) => {
+            const isSelected = answerButton === button;
+            answerButton.classList.toggle("is-selected", isSelected);
+            answerButton.setAttribute("aria-pressed", String(isSelected));
+          });
+        });
+      });
+
+      document
+        .querySelectorAll(".navigation-button")
+        .forEach((button) => {
+          button.addEventListener("click", () => {
+            const isSelected = button.classList.toggle("is-selected");
+            button.setAttribute("aria-pressed", String(isSelected));
+          });
+        });
+    </script>
+  </body>
+</html>

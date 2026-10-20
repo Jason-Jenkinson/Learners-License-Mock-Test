@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./css/results.css" rel="stylesheet" />
+    <title>Results</title>
+  </head>
+  <body>
+    <div class="v1_3">
+      <span class="v4_3">You scored:</span>
+      <span class="v4_5">Review your Answers:</span>
+      <span class="v4_4">45/60</span>
+
+      <button
+        class="interactive-button section-button section-button--1 v4_6"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v4_9">Section 1</span>
+        <span class="v4_10">22/28</span>
+      </button>
+      <button
+        class="interactive-button section-button section-button--2 v4_11"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v4_12">Section 2</span>
+        <span class="v4_13">22/28</span>
+      </button>
+
+      <button
+        class="interactive-button section-button section-button--3 v4_15"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v4_16">Section 3</span>
+        <span class="v4_17">22/28</span>
+      </button>
+
+      <button
+        class="interactive-button action-button v4_19"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v4_20">Disregard Results</span>
+        <span class="v4_21">(Stay as Guest)</span>
+      </button>
+      <button
+        class="interactive-button action-button v4_29"
+        type="button"
+        aria-pressed="false"
+      >
+        <span class="v4_27">Save Results</span>
+        <span class="v4_28">(Login)</span>
+      </button>
+    </div>
+    <script>
+      document.querySelectorAll(".interactive-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const isSelected = button.classList.toggle("is-selected");
+          button.setAttribute("aria-pressed", String(isSelected));
+        });
+      });
+    </script>
+  </body>
+</html>
