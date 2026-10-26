@@ -10,6 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/api/admin/questions")
 public class AdminController {
@@ -36,6 +38,25 @@ public class AdminController {
                                    @RequestBody Dto.QuestionRequest r) {
         check(key);
         return Map.of("questionId", service.create(r, null).questionId, "status", "Unverified");
+    }
+
+    @PostMapping("/bulk")
+    public Map<String, Object> bulkAdd(@RequestHeader(value = "X-Admin-Key", required = false) String key,
+                                       @RequestParam(defaultValue = "false") boolean verify,
+                                       @RequestBody List<Dto.QuestionRequest> requests) {
+        check(key);
+        List<Long> created = new ArrayList<>();
+        List<Map<String, Object>> failed = new ArrayList<>();
+        for (int i = 0; i < requests.size(); i++) {
+            try {
+                Long id = service.create(requests.get(i), null).questionId;
+                if (verify) service.setStatus(id, "Verified");
+                created.add(id);
+            } catch (Exception e) {
+                failed.add(Map.of("index", i, "error", String.valueOf(e.getMessage())));
+            }
+        }
+        return Map.of("imported", created.size(), "failed", failed, "questionIds", created);
     }
 
     @PostMapping("/{id}/verify")
