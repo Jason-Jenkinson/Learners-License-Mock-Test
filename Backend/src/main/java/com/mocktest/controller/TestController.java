@@ -68,6 +68,25 @@ public class TestController {
         return service.submit(id);
     }
 
+    @PostMapping("/tests/{id}/claim")
+    public Map<String, String> claim(@PathVariable Long id, HttpSession s) {
+        Long uid = (Long) s.getAttribute("userId");
+        if (uid == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Log in to save this result");
+
+        TestAttempt attempt = service.getAttempt(id);
+        if (attempt.user != null) {
+            if (!attempt.user.userId.equals(uid))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not your attempt");
+            return Map.of("status", "saved");
+        }
+        if (!guestAttempts(s).contains(id))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not your attempt");
+
+        service.claim(id, uid);
+        guestAttempts(s).remove(id);
+        return Map.of("status", "saved");
+    }
+
     @GetMapping("/tests/{id}/results")
     public Dto.Result results(@PathVariable Long id, HttpSession s) {
         authorize(id, s);

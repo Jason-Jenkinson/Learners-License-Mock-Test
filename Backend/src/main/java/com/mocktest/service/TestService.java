@@ -103,6 +103,17 @@ public class TestService {
         return r;
     }
 
+    @Transactional
+    public void claim(Long attemptId, Long userId) {
+        TestAttempt a = getAttempt(attemptId);
+        if (!a.completed) throw status(HttpStatus.CONFLICT, "Only a completed test can be saved");
+        if (a.user != null && !a.user.userId.equals(userId))
+            throw status(HttpStatus.FORBIDDEN, "Not your attempt");
+        a.user = users.findById(userId)
+                .orElseThrow(() -> status(HttpStatus.NOT_FOUND, "User not found"));
+        attempts.save(a);
+    }
+
     @Transactional(readOnly = true)
     public Dto.Result results(Long attemptId) {
         TestAttempt a = getAttempt(attemptId);
@@ -134,7 +145,7 @@ public class TestService {
                 AnswerOption right = options.findByQuestion_QuestionId(q.questionId).stream()
                         .filter(o -> o.correct).findFirst().orElse(null);
                 AnswerOption sel = aq.selectedOption;
-                wrong.add(new Dto.IncorrectQuestion(q.questionId, q.questionText,
+                wrong.add(new Dto.IncorrectQuestion(q.questionId, aq.questionOrder, q.category.categoryName, q.questionText,
                         sel == null ? null : sel.optionId, sel == null ? null : sel.optionText,
                         right == null ? null : right.optionId, right == null ? null : right.optionText,
                         q.explanation));

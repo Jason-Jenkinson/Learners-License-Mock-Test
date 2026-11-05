@@ -15,7 +15,8 @@ public class Dto {
     public record TestView(Long attemptId, List<QuestionView> questions) {}
 
     public record CategoryResult(String category, int correct, int asked, int required, boolean passed) {}
-    public record IncorrectQuestion(Long questionId, String text, Long selectedOptionId, String selectedText,
+    public record IncorrectQuestion(Long questionId, int order, String category, String text,
+                                    Long selectedOptionId, String selectedText,
                                     Long correctOptionId, String correctText, String explanation) {}
     public record Result(Long attemptId, int score, int total, boolean passed,
                          List<CategoryResult> categories, List<IncorrectQuestion> incorrect) {}

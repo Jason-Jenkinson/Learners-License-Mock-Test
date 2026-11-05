@@ -1,1 +1,41 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" /><link href="./css/login.css" rel="stylesheet" /><link href="./css/responsive-layout.css" rel="stylesheet" /><script src="./js/fit-layout.js" defer></script><title>Login</title></head><body><div class="v8_2 fixed-layout"><div class="v10_88"><div class="v10_47"></div><div class="v10_48"></div><a class="back-results-button" href="./results.html">Back To Results</a><button class="v10_49 standard-action-button" type="button" aria-label="Log in"></button><span class="v10_50">Log in</span><span class="v10_54">Login</span><span class="v10_56">Username:</span><span class="v10_57">Password:</span></div><a class="v10_82" href="./register.html">Register instead?</a></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./css/account.css" rel="stylesheet" />
+    <script src="./js/api.js" defer></script>
+    <script src="./js/auth.js" defer></script>
+    <title>Log in</title>
+  </head>
+  <body>
+    <main class="account-shell">
+      <a class="brand-link" href="./start-test.html">Learners Licence Practice</a>
+      <section class="account-card">
+        <p class="eyebrow">Welcome back</p>
+        <h1>Log in</h1>
+        <p class="account-intro">Sign in to keep track of your test attempts.</p>
+        <form id="login-form" novalidate>
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" required minlength="3" />
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            minlength="6"
+          />
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <button class="button button-primary" type="submit">Log in</button>
+        </form>
+        <p class="account-switch">New here? <a href="./register.html">Create an account</a></p>
+      </section>
+    </main>
+  </body>
+</html>

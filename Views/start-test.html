@@ -8,13 +8,28 @@
       rel="stylesheet"
     />
     <link href="./css/start-test.css" rel="stylesheet" />
+    <script src="./js/api.js" defer></script>
+    <script src="./js/start-test.js" defer></script>
     <title>Start Test</title>
   </head>
   <body>
     <main class="start-page">
+      <nav class="account-nav" id="account-nav" aria-label="Account"></nav>
+      <p class="eyebrow">Learners licence practice</p>
       <h1>Ready to begin?</h1>
-      <p>Start your multiple-choice learners license test.</p>
-      <a class="start-button" href="./test-question.html">Start Test</a>
+      <p class="start-description">
+        Take a timed multiple-choice practice test and review your answers when
+        you finish.
+      </p>
+      <ul class="test-details" aria-label="Test details">
+        <li><strong>Up to 64</strong><span>target questions</span></li>
+        <li><strong>20 min</strong><span>time limit</span></li>
+        <li><strong>3 sections</strong><span>pass requirements</span></li>
+      </ul>
+      <button class="start-button" id="start-button" type="button">Start Test</button>
+      <p class="setup-status" id="setup-status" role="status" aria-live="polite">
+        The test uses the verified questions currently available.
+      </p>
     </main>
   </body>
 </html>

@@ -1,69 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Inter&display=swap"
       rel="stylesheet"
     />
     <link href="./css/results.css" rel="stylesheet" />
-    <title>Results</title>
+    <script src="./js/api.js" defer></script>
+    <script src="./js/results.js" defer></script>
+    <title>Practice Test Results</title>
   </head>
   <body>
-    <div class="v1_3">
-      <span class="v4_3">You scored:</span>
-      <span class="v4_5">Review your Answers:</span>
-      <span class="v4_4">45/60</span>
+    <main class="results-shell">
+      <header class="results-header">
+        <p class="eyebrow">Practice test complete</p>
+        <h1>Your results</h1>
+        <p class="results-intro" id="results-intro">Loading your score…</p>
+      </header>
 
-      <button
-        class="interactive-button section-button section-button--1 v4_6"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v4_9">Section 1</span>
-        <span class="v4_10">22/28</span>
-      </button>
-      <button
-        class="interactive-button section-button section-button--2 v4_11"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v4_12">Section 2</span>
-        <span class="v4_13">22/28</span>
-      </button>
+      <section class="score-card" aria-label="Test score">
+        <div class="score-total">
+          <span class="score-label">Overall result</span>
+          <strong id="score">—</strong>
+          <span class="pass-status" id="pass-status"></span>
+        </div>
+        <div class="score-details">
+          <p><span>Percentage</span><strong id="percentage">—</strong></p>
+          <p><span>Questions</span><strong id="question-total">—</strong></p>
+          <p><span>Completion time</span><strong id="completion-time">—</strong></p>
+        </div>
+      </section>
 
-      <button
-        class="interactive-button section-button section-button--3 v4_15"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v4_16">Section 3</span>
-        <span class="v4_17">22/28</span>
-      </button>
+      <section class="category-section" aria-labelledby="category-heading">
+        <h2 id="category-heading">Results by category</h2>
+        <p class="section-description">
+          You must meet the required mark in each category to pass the test.
+        </p>
+        <div class="category-list" id="category-list"></div>
+      </section>
 
-      <button
-        class="interactive-button action-button v4_19"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v4_20">Disregard Results</span>
-        <span class="v4_21">(Stay as Guest)</span>
-      </button>
-      <button
-        class="interactive-button action-button v4_29"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v4_27">Save Results</span>
-        <span class="v4_28">(Login)</span>
-      </button>
-    </div>
-    <script>
-      document.querySelectorAll(".interactive-button").forEach((button) => {
-        button.addEventListener("click", () => {
-          const isSelected = button.classList.toggle("is-selected");
-          button.setAttribute("aria-pressed", String(isSelected));
-        });
-      });
-    </script>
+      <section class="review-section" aria-labelledby="review-heading">
+        <div class="review-heading-row">
+          <div>
+            <h2 id="review-heading">Review incorrect answers</h2>
+            <p id="review-count"></p>
+          </div>
+          <label class="category-filter">
+            <span>Category</span>
+            <select id="category-filter" aria-label="Filter incorrect answers by category">
+              <option value="all">All categories</option>
+            </select>
+          </label>
+        </div>
+        <div class="review-list" id="review-list"></div>
+      </section>
+
+      <p class="error-message" id="results-error" role="alert" hidden></p>
+      <div class="guest-save-actions" id="guest-save-actions" hidden>
+        <p>Want to keep this result in your test history? Sign in or create an account to save it.</p>
+        <a class="button button-primary" id="save-login-link" href="./login.html">Log in and save</a>
+        <a class="button button-secondary" id="save-register-link" href="./register.html">Create an account and save</a>
+      </div>
+      <div class="results-actions">
+        <a class="button button-secondary" href="./start-test.html">Start a new test</a>
+        <a class="button button-primary" id="history-link" href="./history.html" hidden>View test history</a>
+      </div>
+    </main>
   </body>
 </html>

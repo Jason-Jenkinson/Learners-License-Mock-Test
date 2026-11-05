@@ -5,38 +5,106 @@
 body {
   min-height: 100vh;
   margin: 0;
+  padding: 24px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 1);
-  color: rgba(0, 0, 0, 1);
+  background: #f4f7fb;
+  color: #172033;
   font-family: Inter, sans-serif;
 }
 
 .start-page {
-  padding: 32px;
+  position: relative;
+  width: min(100%, 620px);
+  padding: clamp(28px, 6vw, 56px);
+  border: 1px solid #d7deea;
+  border-radius: 24px;
+  background: #fff;
   text-align: center;
+  box-shadow: 0 12px 32px rgb(23 32 51 / 6%);
+}
+
+.account-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-bottom: 26px;
+  font-size: 0.9rem;
+}
+
+.account-nav a,
+.account-nav button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #315fa5;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.account-nav a:focus-visible,
+.account-nav button:focus-visible {
+  outline: 3px solid #91b9f4;
+  outline-offset: 3px;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  color: #315fa5;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .start-page h1 {
-  margin: 0 0 12px;
-  font-size: 40px;
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 2.75rem);
 }
 
-.start-page p {
+.start-description {
+  max-width: 440px;
+  margin: 16px auto 28px;
+  color: #64728a;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.test-details {
+  display: flex;
+  justify-content: center;
+  gap: clamp(14px, 5vw, 36px);
   margin: 0 0 32px;
-  font-size: 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.test-details li {
+  display: grid;
+  gap: 5px;
+  color: #64728a;
+  font-size: 0.85rem;
+}
+
+.test-details strong {
+  color: #172033;
+  font-size: 1.1rem;
 }
 
 .start-button {
   display: inline-block;
-  padding: 16px 40px;
-  border: 2px solid rgba(77, 128, 205, 1);
-  border-radius: 15px;
-  background: rgba(77, 128, 205, 1);
-  color: rgba(255, 255, 255, 1);
-  font-size: 24px;
+  min-height: 54px;
+  padding: 0 40px;
+  border: 2px solid #4d80cd;
+  border-radius: 12px;
+  background: #4d80cd;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.1rem;
   font-weight: 700;
-  text-decoration: none;
   transition:
     background-color 150ms ease,
     border-color 150ms ease,
@@ -44,8 +112,13 @@ body {
 }
 
 .start-button:hover {
-  border-color: rgba(61, 105, 171, 1);
-  background: rgba(61, 105, 171, 1);
+  border-color: #3d69ab;
+  background: #3d69ab;
+}
+
+.start-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .start-button:active {
@@ -53,6 +126,28 @@ body {
 }
 
 .start-button:focus-visible {
-  outline: 3px solid rgba(77, 128, 205, 1);
+  outline: 3px solid #4d80cd;
   outline-offset: 4px;
+}
+
+.setup-status {
+  min-height: 1.5em;
+  margin: 18px 0 0;
+  color: #64728a;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.setup-status.is-error {
+  color: #b42318;
+}
+
+@media (max-width: 420px) {
+  body {
+    padding: 14px;
+  }
+
+  .test-details {
+    gap: 14px;
+  }
 }
