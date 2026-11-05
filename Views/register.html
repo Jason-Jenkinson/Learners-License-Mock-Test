@@ -1,1 +1,50 @@
-<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" /><link href="./css/register.css" rel="stylesheet" /><link href="./css/responsive-layout.css" rel="stylesheet" /><script src="./js/fit-layout.js" defer></script><title>Register</title></head><body><div class="v8_3 fixed-layout"><div class="v10_87"><div class="v10_71"></div><div class="v10_72"></div><a class="back-results-button" href="./results.html">Back To Results</a><button class="v10_73 standard-action-button" type="button" aria-label="Register"></button><span class="v10_74">Register</span><span class="v10_75">Register</span><span class="v10_76">Username:</span><span class="v10_77">Password:</span><div class="v10_79"></div><span class="v10_80">Confirm Password:</span></div><a class="v10_83" href="./login.html">Login instead?</a></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./css/account.css" rel="stylesheet" />
+    <script src="./js/api.js" defer></script>
+    <script src="./js/auth.js" defer></script>
+    <title>Create an account</title>
+  </head>
+  <body>
+    <main class="account-shell">
+      <a class="brand-link" href="./start-test.html">Learners Licence Practice</a>
+      <section class="account-card">
+        <p class="eyebrow">Save your progress</p>
+        <h1>Create an account</h1>
+        <p class="account-intro">Your account lets you view previous test attempts.</p>
+        <form id="register-form" novalidate>
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" required minlength="3" />
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+          />
+          <label for="confirm-password">Confirm password</label>
+          <input
+            id="confirm-password"
+            name="confirm-password"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+          />
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <button class="button button-primary" type="submit">Create account</button>
+        </form>
+        <p class="account-switch">Already registered? <a href="./login.html">Log in</a></p>
+      </section>
+    </main>
+  </body>
+</html>

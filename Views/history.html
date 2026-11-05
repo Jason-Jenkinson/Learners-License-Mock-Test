@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Inter&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./css/history.css" rel="stylesheet" />
+    <script src="./js/api.js" defer></script>
+    <script src="./js/history.js" defer></script>
+    <title>Test History</title>
+  </head>
+  <body>
+    <main class="history-shell">
+      <header class="history-header">
+        <a class="brand-link" href="./start-test.html">Learners Licence Practice</a>
+        <div class="history-heading">
+          <div>
+            <p class="eyebrow">Your account</p>
+            <h1>Test history</h1>
+          </div>
+          <button class="button button-secondary" id="logout-button" type="button">Log out</button>
+        </div>
+        <p class="history-intro" id="history-intro">Loading your attempts…</p>
+      </header>
+
+      <section class="attempt-list" id="attempt-list" aria-label="Previous test attempts"></section>
+      <p class="error-message" id="history-error" role="alert" hidden></p>
+      <a class="button button-primary" href="./start-test.html">Start a new test</a>
+    </main>
+  </body>
+</html>
