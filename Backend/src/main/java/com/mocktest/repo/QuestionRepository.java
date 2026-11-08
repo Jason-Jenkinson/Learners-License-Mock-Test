@@ -11,4 +11,9 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findEligible(@Param("cid") Long categoryId);
 
     List<Question> findByQuestionTextIgnoreCase(String text);
+
+    List<Question> findBySourceAndActiveTrue(String source);
+
+    @Query("select q.source from Question q where q.source like concat(:prefix, '%')")
+    List<String> findSourcesStartingWith(@Param("prefix") String prefix);
 }
