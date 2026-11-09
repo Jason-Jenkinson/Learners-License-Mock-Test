@@ -1,78 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       href="https://fonts.googleapis.com/css?family=Inter&display=swap"
       rel="stylesheet"
     />
     <link href="./css/test-question.css" rel="stylesheet" />
-    <title>Test_MultipleChoice</title>
+    <title>Practice Test</title>
+    <script src="./js/api.js" defer></script>
+    <script src="./js/quiz.js" defer></script>
   </head>
   <body>
-    <div class="v5_2">
-      <span class="v5_3">Question 5 of 64</span>
-      <span class="v5_15">Time Remaining: 19:55</span>
-      <span class="v5_4"
-        >Question Text block
-      </span>
-      <button
-        class="quiz-button answer-button v5_6"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v5_12">A) Answer text</span>
-      </button>
-      <button
-        class="quiz-button answer-button v5_8"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v5_13">B) Answer text</span>
-      </button>
-      <button
-        class="quiz-button answer-button v5_10"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v5_14">C) Answer text</span>
-      </button>
+    <main class="quiz-shell">
+      <header class="quiz-header">
+        <a class="brand-link" href="./start-test.html">Learners Licence Practice</a>
+        <div class="quiz-status">
+          <div class="progress-copy">
+            <p id="question-count">Loading question…</p>
+            <p id="answered-count"></p>
+          </div>
+          <div class="timer" aria-label="Time remaining">
+            <span aria-hidden="true">Time left</span>
+            <strong id="timer" aria-live="off">20:00</strong>
+          </div>
+        </div>
+        <progress id="quiz-progress" value="0" max="64" aria-label="Test progress"></progress>
+      </header>
 
-      <button
-        class="quiz-button navigation-button navigation-button--next v5_16"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v5_17">Next</span>
-      </button>
-      <button
-        class="quiz-button navigation-button navigation-button--previous v5_19"
-        type="button"
-        aria-pressed="false"
-      >
-        <span class="v5_20">Previous</span>
-      </button>
-    </div>
-    <script>
-      const answerButtons = document.querySelectorAll(".answer-button");
+      <section class="question-card" aria-labelledby="question-text">
+        <p class="question-kicker" id="question-number">Question</p>
+        <h1 id="question-text" tabindex="-1">Loading your test…</h1>
+        <img id="question-image" alt="" hidden />
+        <fieldset class="answer-list">
+          <legend class="visually-hidden">Choose one answer</legend>
+          <div id="answer-options"></div>
+        </fieldset>
+        <p class="error-message" id="quiz-error" role="alert" hidden></p>
+      </section>
 
-      answerButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          answerButtons.forEach((answerButton) => {
-            const isSelected = answerButton === button;
-            answerButton.classList.toggle("is-selected", isSelected);
-            answerButton.setAttribute("aria-pressed", String(isSelected));
-          });
-        });
-      });
-
-      document
-        .querySelectorAll(".navigation-button")
-        .forEach((button) => {
-          button.addEventListener("click", () => {
-            const isSelected = button.classList.toggle("is-selected");
-            button.setAttribute("aria-pressed", String(isSelected));
-          });
-        });
-    </script>
+      <footer class="quiz-footer">
+        <a class="text-link" id="exit-link" href="./start-test.html">Exit test</a>
+        <div class="navigation-controls">
+          <button class="button button-secondary" id="previous-button" type="button">
+            Previous
+          </button>
+          <button class="button button-primary" id="next-button" type="button">
+            Next
+          </button>
+          <button class="button button-primary" id="finish-button" type="button">
+            Finish test
+          </button>
+        </div>
+      </footer>
+    </main>
   </body>
 </html>
