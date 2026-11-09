@@ -39,6 +39,12 @@ The default CORS origin patterns allow local Live Server instances on
 `localhost` and `127.0.0.1`. Set `CORS_ALLOWED_ORIGIN_PATTERNS` to the required
 comma-separated origin patterns for another development or deployment host.
 
+## Testing
+
+Run `.\mvnw.cmd test` from the `Backend` folder. See
+[Backend/TESTING.md](Backend/TESTING.md) for what the tests cover and how to add
+new ones.
+
 ## Learner features
 
 - Guest learners can take a test without registering. Registered learners can
