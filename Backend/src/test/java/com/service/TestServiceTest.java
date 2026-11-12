@@ -16,6 +16,13 @@ import static com.mocktest.TestData.assertStatus;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link TestService}, using mocked repositories.
+ * Covers starting an attempt, saving answers, submitting and scoring,
+ * retrieving results, claiming a guest attempt for a user, and listing a
+ * user's history. Error cases check the HTTP status the service reports
+ * (404 not found, 409 conflict, 400 bad request, 403 forbidden).
+ */
 class TestServiceTest {
     private TestAttemptRepository attempts;
     private AttemptQuestionRepository aqs;
@@ -29,6 +36,10 @@ class TestServiceTest {
     private Category controls;   // 8 questions, pass mark 6
     private Category roadSigns;  // 28 questions, pass mark 23
 
+    /**
+     * Creates fresh mock repositories, builds the {@link TestService} under
+     * test, and prepares the two categories used by the tests.
+     */
     @BeforeEach
     void setUp() {
         attempts = mock(TestAttemptRepository.class);
@@ -45,13 +56,32 @@ class TestServiceTest {
 
     // ---------- helpers ----------
 
+    /**
+     * Creates a guest attempt with the given id and makes the attempt
+     * repository return it from {@code findById}.
+     *
+     * @param id the attempt id
+     * @return the stubbed attempt
+     */
     private TestAttempt attempt(long id) {
         TestAttempt a = TestData.attempt(id, null);
         when(attempts.findById(id)).thenReturn(Optional.of(a));
         return a;
     }
 
-    /** answer: TRUE = correct option picked, FALSE = wrong option picked, null = skipped. */
+    /**
+     * Builds an attempt question with one correct and one wrong option, and
+     * stubs the option repository to return both.
+     *
+     * @param a      the attempt the row belongs to
+     * @param cat    the category of the question
+     * @param qid    the question id (option ids are {@code qid * 10 + 1} for
+     *               the correct option and {@code qid * 10 + 2} for the wrong one)
+     * @param order  the position of the question in the attempt
+     * @param answer TRUE = correct option picked, FALSE = wrong option picked,
+     *               null = skipped
+     * @return the attempt question row
+     */
     private AttemptQuestion row(TestAttempt a, Category cat, long qid, int order, Boolean answer) {
         Question q = TestData.question(qid, cat);
         AnswerOption right = TestData.option(qid * 10 + 1, q, true);
@@ -61,10 +91,23 @@ class TestServiceTest {
         return TestData.attemptQuestion(a, q, order, picked);
     }
 
+    /**
+     * Makes the attempt question repository return the given rows, in order,
+     * for the given attempt.
+     * @param a is the attempt
+     * @param the rows to return
+     */
     private void stubRows(TestAttempt a, AttemptQuestion... rows) {
         when(aqs.findByAttempt_AttemptIdOrderByQuestionOrder(a.attemptId)).thenReturn(List.of(rows));
     }
 
+    /**
+     * Creates an unanswered attempt question for the given question id and
+     * stubs the repository lookup by attempt and question.
+     * @param a   the attempt
+     * @param qid the question id
+     * @return the stubbed attempt question
+     */
     private AttemptQuestion existingRow(TestAttempt a, long qid) {
         Question q = TestData.question(qid, controls);
         AttemptQuestion aq = TestData.attemptQuestion(a, q, 1, null);
@@ -72,15 +115,20 @@ class TestServiceTest {
         return aq;
     }
 
-    // ---------- getAttempt ----------
-
+    /**
+     * Checks that getAttempt responds with 404 when no attempt exists
+     * for the given id.
+     */
     @Test
     void getAttempt_unknownId_isNotFound() {
         assertStatus(404, () -> service.getAttempt(42L));
     }
 
-    // ---------- submit and scoring ----------
-
+    /**
+     * Checks that submitting an attempt with every answer correct passes,
+     * returns no incorrect questions, and stores the score, pass flag,
+     * completed flag and submission time on the attempt before saving it.
+     */
     @Test
     void submit_allCorrect_passesAndStoresScore() {
         TestAttempt a = attempt(1L);
@@ -101,6 +149,11 @@ class TestServiceTest {
         verify(attempts).save(a);
     }
 
+    /**
+     * Checks that the category pass mark is scaled to the number of questions
+     * actually asked. With 4 of 8 questions asked, the required score is
+     * ceil(6 * 4 / 8) = 3, so 3 correct answers pass.
+     */
     @Test
     void submit_passMarkScalesWithQuestionsAsked_threeOfFourPasses() {
         // 6 of 8 required, so 4 asked needs ceil(6 * 4 / 8) = 3
@@ -117,6 +170,10 @@ class TestServiceTest {
         assertEquals(4, r.categories().get(0).asked());
     }
 
+    /**
+     * Checks that a category with fewer correct answers than the scaled pass
+     * mark (2 of 4, where 3 are needed) fails, and so does the whole result.
+     */
     @Test
     void submit_belowScaledPassMark_fails() {
         TestAttempt a = attempt(1L);
@@ -131,6 +188,10 @@ class TestServiceTest {
         assertEquals(2, r.score());
     }
 
+    /**
+     * Checks that a skipped question is scored as incorrect and reported with
+     * no selected option or text, but with the id of the correct option.
+     */
     @Test
     void submit_skippedQuestionCountsAsIncorrect() {
         TestAttempt a = attempt(1L);
@@ -147,6 +208,11 @@ class TestServiceTest {
         assertEquals(21L, missed.correctOptionId());
     }
 
+    /**
+     * Checks that a wrongly answered question is reported with the id of the
+     * option the user selected, the id of the correct option, and the
+     * question's explanation.
+     */
     @Test
     void submit_wrongAnswerReportsSelectedAndCorrectOption() {
         TestAttempt a = attempt(1L);
@@ -160,6 +226,11 @@ class TestServiceTest {
         assertEquals("Because", wrong.explanation());
     }
 
+    /**
+     * Checks that failing one category fails the whole test, even when
+     * another category is answered perfectly. The result must list both
+     * categories and count all questions in the total.
+     */
     @Test
     void submit_oneFailedCategoryFailsTheWholeTest() {
         TestAttempt a = attempt(1L);
@@ -176,6 +247,10 @@ class TestServiceTest {
         assertEquals(5, r.total());
     }
 
+    /**
+     * Checks that submitting an attempt that is already completed responds
+     * with 409 and does not save anything.
+     */
     @Test
     void submit_alreadySubmitted_isConflict() {
         TestAttempt a = attempt(1L);
@@ -185,13 +260,18 @@ class TestServiceTest {
         verify(attempts, never()).save(any());
     }
 
+    /**
+     * Checks that submitting an attempt that does not exist responds with 404.
+     */
     @Test
     void submit_unknownAttempt_isNotFound() {
         assertStatus(404, () -> service.submit(42L));
     }
 
-    // ---------- answer ----------
-
+    /**
+     * Checks that answering a question after the attempt has been submitted
+     * responds with 409 and does not save the answer.
+     */
     @Test
     void answer_afterSubmit_isConflict() {
         TestAttempt a = attempt(1L);
@@ -201,6 +281,10 @@ class TestServiceTest {
         verify(aqs, never()).save(any());
     }
 
+    /**
+     * Checks that answering a question that is not part of the attempt
+     * responds with 404.
+     */
     @Test
     void answer_questionNotInAttempt_isNotFound() {
         attempt(1L);
@@ -208,6 +292,10 @@ class TestServiceTest {
         assertStatus(404, () -> service.answer(1L, new Dto.AnswerRequest(99L, 1L)));
     }
 
+    /**
+     * Checks that choosing an option id that does not exist responds with 400
+     * and does not save anything.
+     */
     @Test
     void answer_unknownOption_isBadRequest() {
         TestAttempt a = attempt(1L);
@@ -217,6 +305,10 @@ class TestServiceTest {
         verify(aqs, never()).save(any());
     }
 
+    /**
+     * Checks that choosing an option that belongs to a different question
+     * responds with 400 and does not save anything.
+     */
     @Test
     void answer_optionFromAnotherQuestion_isBadRequest() {
         TestAttempt a = attempt(1L);
@@ -228,6 +320,10 @@ class TestServiceTest {
         verify(aqs, never()).save(any());
     }
 
+    /**
+     * Checks that a valid option belonging to the question is stored as the
+     * selected option and the attempt question is saved.
+     */
     @Test
     void answer_validOption_isSaved() {
         TestAttempt a = attempt(1L);
@@ -241,6 +337,10 @@ class TestServiceTest {
         verify(aqs).save(aq);
     }
 
+    /**
+     * Checks that answering the same question a second time replaces the
+     * earlier selection with the new one.
+     */
     @Test
     void answer_changingAnswer_replacesThePreviousOne() {
         TestAttempt a = attempt(1L);
@@ -256,6 +356,10 @@ class TestServiceTest {
         assertSame(second, aq.selectedOption);
     }
 
+    /**
+     * Checks that sending a null option id clears the existing selection and
+     * saves the attempt question.
+     */
     @Test
     void answer_nullOption_clearsTheSelection() {
         TestAttempt a = attempt(1L);
@@ -268,8 +372,10 @@ class TestServiceTest {
         verify(aqs).save(aq);
     }
 
-    // ---------- results ----------
-
+    /**
+     * Checks that requesting results for an attempt that has not been
+     * submitted responds with 409.
+     */
     @Test
     void results_beforeSubmit_isConflict() {
         attempt(1L);
@@ -277,6 +383,10 @@ class TestServiceTest {
         assertStatus(409, () -> service.results(1L));
     }
 
+    /**
+     * Checks that results for a completed attempt use the score and pass flag
+     * stored on the attempt, and still list the incorrect questions.
+     */
     @Test
     void results_afterSubmit_usesStoredScoreAndPassFlag() {
         TestAttempt a = attempt(1L);
@@ -295,8 +405,10 @@ class TestServiceTest {
         assertEquals(1, r.incorrect().size());
     }
 
-    // ---------- claim ----------
-
+    /**
+     * Checks that claiming an attempt that has not been completed responds
+     * with 409.
+     */
     @Test
     void claim_unfinishedTest_isConflict() {
         attempt(1L);
@@ -304,6 +416,10 @@ class TestServiceTest {
         assertStatus(409, () -> service.claim(1L, 3L));
     }
 
+    /**
+     * Checks that claiming an attempt that already belongs to a different
+     * user responds with 403 and does not save anything.
+     */
     @Test
     void claim_attemptOfAnotherUser_isForbidden() {
         TestAttempt a = attempt(1L);
@@ -314,6 +430,10 @@ class TestServiceTest {
         verify(attempts, never()).save(any());
     }
 
+    /**
+     * Checks that claiming an attempt for a user id that does not exist
+     * responds with 404.
+     */
     @Test
     void claim_unknownUser_isNotFound() {
         TestAttempt a = attempt(1L);
@@ -322,6 +442,10 @@ class TestServiceTest {
         assertStatus(404, () -> service.claim(1L, 3L));
     }
 
+    /**
+     * Checks that claiming a completed guest attempt links it to the user and
+     * saves the attempt.
+     */
     @Test
     void claim_guestAttempt_isLinkedToTheUser() {
         TestAttempt a = attempt(1L);
@@ -335,8 +459,11 @@ class TestServiceTest {
         verify(attempts).save(a);
     }
 
-    // ---------- history ----------
-
+    /**
+     * Checks that history maps a user's attempts to summaries and
+     * keeps the repository order (newest first), carrying over the id,
+     * completed flag and score.
+     */
     @Test
     void history_mapsAttemptsToSummaries() {
         TestAttempt a1 = TestData.attempt(1, null);
@@ -355,8 +482,12 @@ class TestServiceTest {
         assertFalse(result.get(1).completed());
     }
 
-    // ---------- start ----------
-
+    /**
+     * Makes attempts.save assign the given id to the attempt it
+     * receives, mimicking database id generation.
+     *
+     * @param id the id to assign
+     */
     private void stubAttemptSave(long id) {
         when(attempts.save(any(TestAttempt.class))).thenAnswer(i -> {
             TestAttempt t = i.getArgument(0);
@@ -365,6 +496,10 @@ class TestServiceTest {
         });
     }
 
+    /**
+     * Checks that starting a test when no eligible questions exist responds
+     * with 409 and saves no attempt questions.
+     */
     @Test
     void start_noEligibleQuestions_isConflict() {
         stubAttemptSave(7L);
@@ -375,6 +510,11 @@ class TestServiceTest {
         verify(aqs, never()).save(any());
     }
 
+    /**
+     * Checks that starting a test returns the new attempt id and every
+     * selected question with its options, numbers the questions 1 to n (in
+     * any order), and saves one attempt question per question.
+     */
     @Test
     void start_returnsQuestionsWithOptionsAndNumbersThem() {
         stubAttemptSave(7L);
@@ -401,12 +541,21 @@ class TestServiceTest {
         verify(aqs, times(2)).save(any(AttemptQuestion.class));
     }
 
+    /**
+     * Checks that the view sent to the browser cannot reveal the correct
+     * answer. OptionView must only have two fields (id and text), so
+     * the correct flag is never exposed.
+     */
     @Test
     void start_viewDoesNotRevealWhichOptionIsCorrect() {
         // OptionView only carries id and text, so the correct flag cannot leak to the browser.
         assertEquals(2, Dto.OptionView.class.getRecordComponents().length);
     }
 
+    /**
+     * Checks that starting a test for a registered user looks the user up and
+     * links that user to the saved attempt.
+     */
     @Test
     void start_registeredUser_isLinkedToTheAttempt() {
         stubAttemptSave(7L);
