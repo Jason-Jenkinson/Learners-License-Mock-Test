@@ -16,6 +16,14 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration tests for the question bank and the full test flow, run against
+ * the real Spring context with the "test" profile.
+ *
+ * Uses the real repositories and TestService to check
+ * that the question bank is imported and that a complete test can be started,
+ * answered and submitted.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
 class QuestionBankFlowTests {
@@ -24,6 +32,10 @@ class QuestionBankFlowTests {
     @Autowired CategoryRepository categories;
     @Autowired TestService tests;
 
+    /**
+     * Checks that the JSON question bank was imported (more than 1000
+     * questions) and that every category has at least one eligible question.
+     */
     @Test
     void bankIsImportedIntoAllThreeCategories() {
         assertTrue(questions.count() > 1000, "expected the JSON bank to be imported");
@@ -31,6 +43,12 @@ class QuestionBankFlowTests {
                 assertFalse(questions.findEligible(c.categoryId).isEmpty(), "no questions for " + c.categoryName));
     }
 
+    /**
+     * Checks that a full test contains 64 questions split across the
+     * categories as 28 "Rules of the road", 28 "Road signs" and 8 "Controls of
+     * the vehicle". Then answers every question correctly and checks that
+     * submitting gives a score of 64, a pass, and no incorrect questions.
+     */
     @Test
     void fullTestHas64QuestionsAndAllCorrectAnswersPass() {
         Dto.TestView view = tests.start(null);
@@ -52,6 +70,10 @@ class QuestionBankFlowTests {
         assertTrue(result.incorrect().isEmpty());
     }
 
+    /**
+     * Checks that submitting a test without answering anything gives a score
+     * of 0, a fail, and lists all 64 questions as incorrect.
+     */
     @Test
     void unansweredTestFailsAndListsEveryQuestion() {
         Dto.TestView view = tests.start(null);

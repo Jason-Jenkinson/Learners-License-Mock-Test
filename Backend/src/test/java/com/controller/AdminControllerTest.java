@@ -1,3 +1,4 @@
+
 package com.mocktest.controller;
 
 import com.mocktest.dto.Dto;
@@ -13,27 +14,50 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the AdminController.
+ * Tests the bulk question import functionality, API key validation,
+ * question verification, and question listing access control.
+ */
 class AdminControllerTest {
+
     private QuestionService service;
     private AdminController controller;
 
+    /**
+     * Initialises the mocked QuestionService and AdminController
+     * before each test.
+     */
     @BeforeEach
     void setUp() {
         service = mock(QuestionService.class);
         controller = new AdminController(service, "test-key");
     }
 
+    /**
+     * Creates a sample question request containing two answer options.
+     * @return a sample QuestionRequest object
+     */
     private Dto.QuestionRequest sample() {
         return new Dto.QuestionRequest(1L, "Sample?", null, "Because", "test",
                 List.of(new Dto.OptionRequest("A", true), new Dto.OptionRequest("B", false)));
     }
 
+    /**
+     * Creates a Question object with the specified ID.
+     * @param id the question ID
+     * @return a Question object with the assigned ID
+     */
     private Question questionWithId(long id) {
         Question q = new Question();
         q.questionId = id;
         return q;
     }
 
+    /**
+     * Tests that bulkAdd successfully imports all supplied questions.
+     * Verifies that the imported count and question IDs are returned.
+     */
     @Test
     void bulkAdd_importsAllQuestions() {
         when(service.create(any(), any())).thenReturn(questionWithId(1L), questionWithId(2L));
@@ -45,6 +69,12 @@ class AdminControllerTest {
         verify(service, never()).setStatus(anyLong(), anyString());
     }
 
+    /**
+     * Tests that bulkAdd continues processing questions when one
+     * question fails to import.
+     * Verifies that successful imports are counted and the failed
+     * question's index is included in the response.
+     */
     @Test
     @SuppressWarnings("unchecked")
     void bulkAdd_oneBadQuestionDoesNotStopTheRest() {
@@ -62,6 +92,10 @@ class AdminControllerTest {
         assertEquals(1, failed.get(0).get("index"));
     }
 
+    /**
+     * Tests that successfully imported questions are marked as
+     * Verified when the verify parameter is true.
+     */
     @Test
     void bulkAdd_verifyTrueMarksQuestionsVerified() {
         when(service.create(any(), any())).thenReturn(questionWithId(1L));
@@ -71,6 +105,12 @@ class AdminControllerTest {
         verify(service).setStatus(1L, "Verified");
     }
 
+    /**
+     * Tests that a bulk import request with an incorrect API key
+     * gets rejected with HTTP 403 Forbidden.
+     *
+     * Verifies that the service is not called.
+     */
     @Test
     void bulkAdd_wrongKeyIsRejected() {
         ResponseStatusException ex = assertThrows(ResponseStatusException.class,
@@ -80,6 +120,12 @@ class AdminControllerTest {
         verifyNoInteractions(service);
     }
 
+    /**
+     * Tests that a bulk import request without an API key
+     * is rejected.
+     *
+     * Verifies that the service is not called.
+     */
     @Test
     void bulkAdd_missingKeyIsRejected() {
         assertThrows(ResponseStatusException.class,
@@ -87,6 +133,10 @@ class AdminControllerTest {
         verifyNoInteractions(service);
     }
 
+    /**
+     * Tests that submitting an empty question list results in
+     * 0 imports and no interactions with the service.
+     */
     @Test
     void bulkAdd_emptyListImportsNothing() {
         Map<String, Object> result = controller.bulkAdd("test-key", false, List.of());
@@ -95,6 +145,11 @@ class AdminControllerTest {
         verifyNoInteractions(service);
     }
 
+    /**
+     * Tests that attempting to list questions with an incorrect
+     * API key gets rejected
+     * Verifies the service is not called
+     */
     @Test
     void list_wrongKeyIsRejected() {
         assertThrows(ResponseStatusException.class, () -> controller.list("wrong-key"));
